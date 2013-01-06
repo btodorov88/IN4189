@@ -45,11 +45,11 @@ public class MaterialTest {
 
 	/*@Test
 	public void testMaterialMaterialDef() {
-		material.setInt("test", 5);
-		assertTrue(true);
-	}*/
+		MaterialDef def = material.getMaterialDef();
+		assertEquals(materialDef, def);
+	}
 
-	/*@Test
+	@Test
 	public void testMaterialAssetManagerString() {
 		//fail("Not yet implemented");
 		assert(true);
@@ -59,13 +59,12 @@ public class MaterialTest {
 	public void testMaterial() {
 		fail("Not yet implemented");
 	}
-
-	*/
+*/
+	
 	@Test
 	public void testGetAssetName() {
 		String assetName = material.getAssetName();
 		assertEquals(null, assetName);
-		
 	}
 
 	
