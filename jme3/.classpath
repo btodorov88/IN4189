@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test-data"/>
 	<classpathentry kind="src" path="core-data"/>
 	<classpathentry kind="src" path="core-effects"/>
@@ -20,7 +19,7 @@
 	<classpathentry kind="src" path="jogg"/>
 	<classpathentry kind="src" path="xml"/>
 	<classpathentry kind="src" path="blender"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="lib/jogl/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogl/joal-natives-windows-i586.jar"/>
 	<classpathentry kind="lib" path="lib/jogl/joal.jar"/>
@@ -39,5 +38,7 @@
 	<classpathentry kind="lib" path="lib/niftygui/nifty-style-black.jar"/>
 	<classpathentry kind="lib" path="lib/niftygui/nifty.jar"/>
 	<classpathentry kind="lib" path="lib/niftygui/xmlpull-xpp3.jar"/>
+	<classpathentry kind="lib" path="lib/junit_4/junit-4.5.jar"/>
+	<classpathentry kind="lib" path="lib/jmockit/jmockit.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
