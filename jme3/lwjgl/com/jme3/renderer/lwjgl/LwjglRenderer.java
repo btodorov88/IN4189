@@ -31,12 +31,172 @@
  */
 package com.jme3.renderer.lwjgl;
 
+import static org.lwjgl.opengl.ARBTextureMultisample.GL_MAX_COLOR_TEXTURE_SAMPLES;
+import static org.lwjgl.opengl.ARBTextureMultisample.GL_MAX_DEPTH_TEXTURE_SAMPLES;
+import static org.lwjgl.opengl.ARBTextureMultisample.GL_SAMPLE_POSITION;
+import static org.lwjgl.opengl.ARBTextureMultisample.glGetMultisample;
+import static org.lwjgl.opengl.EXTFramebufferBlit.GL_DRAW_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferBlit.GL_READ_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferBlit.glBlitFramebufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferMultisample.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT;
+import static org.lwjgl.opengl.EXTFramebufferMultisample.GL_MAX_SAMPLES_EXT;
+import static org.lwjgl.opengl.EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT15_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_MAX_COLOR_ATTACHMENTS_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_MAX_RENDERBUFFER_SIZE_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_RENDERBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindRenderbufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glCheckFramebufferStatusEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferRenderbufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferTexture2DEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGenFramebuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGenRenderbuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGenerateMipmapEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGetFramebufferAttachmentParameterEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glIsFramebufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glIsRenderbufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glRenderbufferStorageEXT;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_BGRA;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL12.GL_MAX_ELEMENTS_INDICES;
+import static org.lwjgl.opengl.GL12.GL_MAX_ELEMENTS_VERTICES;
+import static org.lwjgl.opengl.GL12.GL_TEXTURE_3D;
+import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
+import static org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R;
+import static org.lwjgl.opengl.GL12.glDrawRangeElements;
+import static org.lwjgl.opengl.GL13.GL_CLAMP_TO_BORDER;
+import static org.lwjgl.opengl.GL13.GL_MAX_CUBE_MAP_TEXTURE_SIZE;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL14.GL_COMPARE_R_TO_TEXTURE;
+import static org.lwjgl.opengl.GL14.GL_DECR_WRAP;
+import static org.lwjgl.opengl.GL14.GL_DEPTH_TEXTURE_MODE;
+import static org.lwjgl.opengl.GL14.GL_GENERATE_MIPMAP;
+import static org.lwjgl.opengl.GL14.GL_INCR_WRAP;
+import static org.lwjgl.opengl.GL14.GL_MIRRORED_REPEAT;
+import static org.lwjgl.opengl.GL14.GL_TEXTURE_COMPARE_FUNC;
+import static org.lwjgl.opengl.GL14.GL_TEXTURE_COMPARE_MODE;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glBufferSubData;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_INFO_LOG_LENGTH;
+import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
+import static org.lwjgl.opengl.GL20.GL_MAX_DRAW_BUFFERS;
+import static org.lwjgl.opengl.GL20.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS;
+import static org.lwjgl.opengl.GL20.GL_MAX_TEXTURE_IMAGE_UNITS;
+import static org.lwjgl.opengl.GL20.GL_MAX_VERTEX_ATTRIBS;
+import static org.lwjgl.opengl.GL20.GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS;
+import static org.lwjgl.opengl.GL20.GL_MAX_VERTEX_UNIFORM_COMPONENTS;
+import static org.lwjgl.opengl.GL20.GL_POINT_SPRITE;
+import static org.lwjgl.opengl.GL20.GL_SHADING_LANGUAGE_VERSION;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_PROGRAM_POINT_SIZE;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL20.glAttachShader;
+import static org.lwjgl.opengl.GL20.glCompileShader;
+import static org.lwjgl.opengl.GL20.glCreateProgram;
+import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDeleteProgram;
+import static org.lwjgl.opengl.GL20.glDeleteShader;
+import static org.lwjgl.opengl.GL20.glDetachShader;
+import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glDrawBuffers;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glGetAttribLocation;
+import static org.lwjgl.opengl.GL20.glGetProgram;
+import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
+import static org.lwjgl.opengl.GL20.glGetShader;
+import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glLinkProgram;
+import static org.lwjgl.opengl.GL20.glShaderSource;
+import static org.lwjgl.opengl.GL20.glStencilFuncSeparate;
+import static org.lwjgl.opengl.GL20.glStencilOpSeparate;
+import static org.lwjgl.opengl.GL20.glUniform1;
+import static org.lwjgl.opengl.GL20.glUniform1f;
+import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL20.glUniform2;
+import static org.lwjgl.opengl.GL20.glUniform2f;
+import static org.lwjgl.opengl.GL20.glUniform3;
+import static org.lwjgl.opengl.GL20.glUniform3f;
+import static org.lwjgl.opengl.GL20.glUniform4;
+import static org.lwjgl.opengl.GL20.glUniform4f;
+import static org.lwjgl.opengl.GL20.glUniformMatrix3;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4;
+import static org.lwjgl.opengl.GL20.glUseProgram;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import jme3tools.converters.MipMapGenerator;
+import jme3tools.shader.ShaderDebug;
+
+import org.lwjgl.opengl.ARBDrawInstanced;
+import org.lwjgl.opengl.ARBFramebufferObject;
+import org.lwjgl.opengl.ARBMultisample;
+import org.lwjgl.opengl.ARBTextureMultisample;
+import org.lwjgl.opengl.ARBVertexArrayObject;
+import org.lwjgl.opengl.ContextCapabilities;
+import org.lwjgl.opengl.EXTTextureArray;
+import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GLContext;
+
 import com.jme3.light.LightList;
 import com.jme3.material.RenderState;
 import com.jme3.material.RenderState.StencilOperation;
 import com.jme3.material.RenderState.TestFunction;
-import com.jme3.math.*;
-import com.jme3.renderer.*;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
+import com.jme3.math.Matrix4f;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
+import com.jme3.math.Vector4f;
+import com.jme3.renderer.Caps;
+import com.jme3.renderer.IDList;
+import com.jme3.renderer.RenderContext;
+import com.jme3.renderer.Renderer;
+import com.jme3.renderer.RendererException;
+import com.jme3.renderer.Statistics;
+import com.jme3.renderer.lwjgl.gl1.api.GLImageFormat;
+import com.jme3.renderer.lwjgl.gl1.api.TextureUtil;
+import com.jme3.renderer.lwjgl.gl1.utils.TextureUtilImpl;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Mesh.Mode;
 import com.jme3.scene.VertexBuffer;
@@ -57,24 +217,6 @@ import com.jme3.util.BufferUtils;
 import com.jme3.util.ListMap;
 import com.jme3.util.NativeObjectManager;
 import com.jme3.util.SafeArrayList;
-import java.nio.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import jme3tools.converters.MipMapGenerator;
-import jme3tools.shader.ShaderDebug;
-import static org.lwjgl.opengl.ARBTextureMultisample.*;
-import static org.lwjgl.opengl.EXTFramebufferBlit.*;
-import static org.lwjgl.opengl.EXTFramebufferMultisample.*;
-import static org.lwjgl.opengl.EXTFramebufferObject.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL14.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import org.lwjgl.opengl.*;
 //import static org.lwjgl.opengl.ARBDrawInstanced.*;
 
 public class LwjglRenderer implements Renderer {
@@ -113,6 +255,8 @@ public class LwjglRenderer implements Renderer {
     private final Statistics statistics = new Statistics();
     private int vpX, vpY, vpW, vpH;
     private int clipX, clipY, clipW, clipH;
+    
+    private TextureUtil textureUtil = new TextureUtilImpl();
 
     public LwjglRenderer() {
     }
@@ -1351,7 +1495,7 @@ public class LwjglRenderer implements Renderer {
                     + ":" + fb.getHeight() + " is not supported.");
         }
 
-        TextureUtil.GLImageFormat glFmt = TextureUtil.getImageFormatWithError(rb.getFormat());
+        GLImageFormat glFmt = textureUtil.getImageFormatWithError(rb.getFormat());
 
         if (fb.getSamples() > 1 && GLContext.getCapabilities().GL_EXT_framebuffer_multisample) {
             int samples = fb.getSamples();
@@ -1872,19 +2016,19 @@ public class LwjglRenderer implements Renderer {
                 return;
             }
             for (int i = 0; i < 6; i++) {
-                TextureUtil.uploadTexture(img, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, i, 0);
+            	textureUtil.uploadTexture(img, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, i, 0);
             }
         } else if (target == EXTTextureArray.GL_TEXTURE_2D_ARRAY_EXT) {
             List<ByteBuffer> data = img.getData();
             // -1 index specifies prepare data for 2D Array
-            TextureUtil.uploadTexture(img, target, -1, 0);
+            textureUtil.uploadTexture(img, target, -1, 0);
             for (int i = 0; i < data.size(); i++) {
                 // upload each slice of 2D array in turn
                 // this time with the appropriate index
-                TextureUtil.uploadTexture(img, target, i, 0);
+            	textureUtil.uploadTexture(img, target, i, 0);
             }
         } else {
-            TextureUtil.uploadTexture(img, target, 0, 0);
+        	textureUtil.uploadTexture(img, target, 0, 0);
         }
 
         if (img.getMultiSamples() != imageSamples) {
