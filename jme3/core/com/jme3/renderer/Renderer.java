@@ -67,7 +67,7 @@ public interface Renderer {
      * to call {@link Statistics#clearFrame() } at the appropriate time
      * to get accurate info per frame.
      */
-    public Statistics getStatistics();
+    public IStatistics getStatistics();
 
     /**
      * Invalidates the current rendering state. Should be called after

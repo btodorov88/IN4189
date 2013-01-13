@@ -34,6 +34,7 @@ package com.jme3.app;
 import com.jme3.asset.AssetManager;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
+import com.jme3.renderer.IStatistics;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.Statistics;
 import com.jme3.renderer.ViewPort;
@@ -61,7 +62,7 @@ import com.jme3.scene.control.Control;
 public class StatsView extends Node implements Control {
 
     private BitmapText[] labels;
-    private Statistics statistics;
+    private IStatistics statistics;
 
     private String[] statLabels;
     private int[] statData;
@@ -70,7 +71,7 @@ public class StatsView extends Node implements Control {
     
     private final StringBuilder stringBuilder = new StringBuilder();
 
-    public StatsView(String name, AssetManager manager, Statistics stats){
+    public StatsView(String name, AssetManager manager, IStatistics stats){
         super(name);
 
         setQueueBucket(Bucket.Gui);

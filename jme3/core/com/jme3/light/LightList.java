@@ -70,6 +70,8 @@ public final class LightList implements Iterable<Light>, Savable, Cloneable {
      * Default constructor for serialization. Do not use
      */
     public LightList(){
+    	list = new Light[1];
+    	distToOwner = new float[1];
     }
 
     /**

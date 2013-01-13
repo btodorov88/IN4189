@@ -32,22 +32,32 @@
 
 package com.jme3.system.lwjgl;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.ARBFramebufferObject;
+import org.lwjgl.opengl.ContextAttribs;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.EXTFramebufferMultisample;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.Pbuffer;
+import org.lwjgl.opengl.PixelFormat;
+
 import com.jme3.input.lwjgl.JInputJoyInput;
 import com.jme3.input.lwjgl.LwjglKeyInput;
 import com.jme3.input.lwjgl.LwjglMouseInput;
 import com.jme3.math.FastMath;
 import com.jme3.renderer.Renderer;
-import com.jme3.renderer.lwjgl.LwjglGL1Renderer;
 import com.jme3.renderer.lwjgl.LwjglRenderer;
+import com.jme3.renderer.lwjgl.gl1.LwjglGL1Renderer;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeContext;
 import com.jme3.system.SystemListener;
 import com.jme3.system.Timer;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.*;
 
 /**
  * A LWJGL implementation of a graphics context.
