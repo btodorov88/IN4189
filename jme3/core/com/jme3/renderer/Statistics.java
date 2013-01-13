@@ -44,7 +44,7 @@ import java.util.HashSet;
  * 
  * @author Kirill Vainer
  */
-public class Statistics {
+public class Statistics implements IStatistics {
 
     protected int numObjects;
     protected int numTriangles;
@@ -62,14 +62,11 @@ public class Statistics {
     protected HashSet<Integer> texturesUsed = new HashSet<Integer>();
     protected HashSet<Integer> fbosUsed = new HashSet<Integer>();
 
-    /**
-     * Returns a list of labels corresponding to each statistic.
-     * 
-     * @return a list of labels corresponding to each statistic.
-     * 
-     * @see #getData(int[]) 
-     */
-    public String[] getLabels(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#getLabels()
+	 */
+    @Override
+	public String[] getLabels(){
         return new String[]{ "Vertices",
                              "Triangles",
                              "Uniforms",
@@ -90,14 +87,11 @@ public class Statistics {
 
     }
 
-    /**
-     * Retrieves the statistics data into the given array.
-     * The array should be as large as the array given in 
-     * {@link #getLabels() }.
-     * 
-     * @param data The data array to write to
-     */
-    public void getData(int[] data){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#getData(int[])
+	 */
+    @Override
+	public void getData(int[] data){
         data[0] = numVertices;
         data[1] = numTriangles;
         data[2] = numUniformsSet;
@@ -116,23 +110,21 @@ public class Statistics {
         data[12] = memoryFrameBuffers;
     }
 
-    /**
-     * Called by the Renderer when a mesh has been drawn.
-     * 
-     */
-    public void onMeshDrawn(Mesh mesh, int lod){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onMeshDrawn(com.jme3.scene.Mesh, int)
+	 */
+    @Override
+	public void onMeshDrawn(Mesh mesh, int lod){
         numObjects ++;
         numTriangles += mesh.getTriangleCount(lod);
         numVertices += mesh.getVertexCount();
     }
 
-    /**
-     * Called by the Renderer when a shader has been utilized.
-     * 
-     * @param shader The shader that was used
-     * @param wasSwitched If true, the shader has required a state switch
-     */
-    public void onShaderUse(Shader shader, boolean wasSwitched){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onShaderUse(com.jme3.shader.Shader, boolean)
+	 */
+    @Override
+	public void onShaderUse(Shader shader, boolean wasSwitched){
         assert shader.getId() >= 1;
 
         if (!shadersUsed.contains(shader.getId()))
@@ -142,20 +134,19 @@ public class Statistics {
             numShaderSwitches++;
     }
 
-    /**
-     * Called by the Renderer when a uniform was set.
-     */
-    public void onUniformSet(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onUniformSet()
+	 */
+    @Override
+	public void onUniformSet(){
         numUniformsSet ++;
     }
 
-    /**
-     * Called by the Renderer when a texture has been set.
-     * 
-     * @param image The image that was set
-     * @param wasSwitched If true, the texture has required a state switch
-     */
-    public void onTextureUse(Image image, boolean wasSwitched){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onTextureUse(com.jme3.texture.Image, boolean)
+	 */
+    @Override
+	public void onTextureUse(Image image, boolean wasSwitched){
         assert image.getId() >= 1;
 
         if (!texturesUsed.contains(image.getId()))
@@ -165,13 +156,11 @@ public class Statistics {
             numTextureBinds ++;
     }
 
-    /**
-     * Called by the Renderer when a framebuffer has been set.
-     * 
-     * @param fb The framebuffer that was set
-     * @param wasSwitched If true, the framebuffer required a state switch
-     */
-    public void onFrameBufferUse(FrameBuffer fb, boolean wasSwitched){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onFrameBufferUse(com.jme3.texture.FrameBuffer, boolean)
+	 */
+    @Override
+	public void onFrameBufferUse(FrameBuffer fb, boolean wasSwitched){
         if (fb != null){
             assert fb.getId() >= 1;
 
@@ -183,10 +172,11 @@ public class Statistics {
             numFboSwitches ++;
     }
     
-    /**
-     * Clears all frame-specific statistics such as objects used per frame.
-     */
-    public void clearFrame(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#clearFrame()
+	 */
+    @Override
+	public void clearFrame(){
         shadersUsed.clear();
         texturesUsed.clear();
         fbosUsed.clear();
@@ -200,52 +190,59 @@ public class Statistics {
         numUniformsSet = 0;
     }
 
-    /**
-     * Called by the Renderer when it creates a new shader
-     */
-    public void onNewShader(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onNewShader()
+	 */
+    @Override
+	public void onNewShader(){
         memoryShaders ++;
     }
 
-    /**
-     * Called by the Renderer when it creates a new texture
-     */
-    public void onNewTexture(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onNewTexture()
+	 */
+    @Override
+	public void onNewTexture(){
         memoryTextures ++;
     }
 
-    /**
-     * Called by the Renderer when it creates a new framebuffer
-     */
-    public void onNewFrameBuffer(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onNewFrameBuffer()
+	 */
+    @Override
+	public void onNewFrameBuffer(){
         memoryFrameBuffers ++;
     }
 
-    /**
-     * Called by the Renderer when it deletes a shader
-     */
-    public void onDeleteShader(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onDeleteShader()
+	 */
+    @Override
+	public void onDeleteShader(){
         memoryShaders --;
     }
 
-    /**
-     * Called by the Renderer when it deletes a texture
-     */
-    public void onDeleteTexture(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onDeleteTexture()
+	 */
+    @Override
+	public void onDeleteTexture(){
         memoryTextures --;
     }
 
-    /**
-     * Called by the Renderer when it deletes a framebuffer
-     */
-    public void onDeleteFrameBuffer(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#onDeleteFrameBuffer()
+	 */
+    @Override
+	public void onDeleteFrameBuffer(){
         memoryFrameBuffers --;
     }
 
-    /**
-     * Called when video memory is cleared.
-     */
-    public void clearMemory(){
+    /* (non-Javadoc)
+	 * @see com.jme3.renderer.IStatistics#clearMemory()
+	 */
+    @Override
+	public void clearMemory(){
         memoryFrameBuffers = 0;
         memoryShaders = 0;
         memoryTextures = 0;
