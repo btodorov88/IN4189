@@ -1,0 +1,5 @@
+1. Create abstract class
+2. Remove unused code
+3. Move the same code to parent
+4. Create interface GL
+5. Create JOGL
